@@ -31,6 +31,54 @@ def twinPrimesUpTo (X : ℕ) : Finset ℕ :=
 /-- Count of twin primes up to X: π₂(X) -/
 def twinPrimeCount (X : ℕ) : ℕ := (twinPrimesUpTo X).card
 
+/-! # Goldbach Definitions
+
+Goldbach's Conjecture: Every even integer N ≥ 4 is the sum of two primes.
+
+The Sobolev-Q3 engine adapts to Goldbach by changing:
+- Phase twist: e(2α) → e(Nα)
+- Pair condition: (p, p+2) → (p, N-p)
+-/
+
+/-- Goldbach pair: p and N-p are both prime -/
+def IsGoldbachPair (N p : ℕ) : Prop :=
+  Nat.Prime p ∧ Nat.Prime (N - p) ∧ p ≤ N / 2
+
+/-- Decidability for IsGoldbachPair -/
+instance (N : ℕ) : DecidablePred (IsGoldbachPair N) := fun p =>
+  @instDecidableAnd _ _ (Nat.decidablePrime p)
+    (@instDecidableAnd _ _ (Nat.decidablePrime (N - p)) (Nat.decLe p (N / 2)))
+
+/-- The set of Goldbach pairs for even N -/
+def goldbachPairs (N : ℕ) : Finset ℕ :=
+  (Finset.range (N / 2 + 1)).filter (IsGoldbachPair N)
+
+/-- Count of Goldbach representations: r(N) = #{p : p + (N-p) = N, both prime} -/
+def goldbachCount (N : ℕ) : ℕ := (goldbachPairs N).card
+
+/-- Goldbach's Conjecture: Every even N ≥ 4 has at least one Goldbach pair -/
+def GoldbachConjecture : Prop :=
+  ∀ N : ℕ, Even N → N ≥ 4 → ∃ p, IsGoldbachPair N p
+
+/-! # Goldbach Singular Series
+
+The Goldbach singular series 𝔖(N) depends on N:
+  𝔖(N) = 2·C₂ · Π_{p|N, p>2} (p-1)/(p-2)
+
+For typical even N, 𝔖(N) ≈ 1.32 (same as twin primes).
+-/
+
+/-- Goldbach singular series for even N -/
+axiom goldbach_singular_series (N : ℕ) : ℝ
+
+/-- Goldbach singular series is positive for N ≥ 4 -/
+axiom goldbach_singular_series_pos (N : ℕ) (hN : N ≥ 4) :
+  goldbach_singular_series N > 0
+
+/-- Lower bound: 𝔖(N) ≥ c₀ > 0 uniformly -/
+axiom goldbach_singular_series_lower_bound :
+  ∃ c₀ : ℝ, c₀ > 0 ∧ ∀ N : ℕ, N ≥ 4 → goldbach_singular_series N ≥ c₀
+
 /-! # Prime Exponential Sums -/
 
 noncomputable section PrimeExpSum

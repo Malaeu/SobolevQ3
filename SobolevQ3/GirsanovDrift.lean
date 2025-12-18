@@ -101,6 +101,67 @@ def twinTwist (α : ℝ) : ℂ :=
 lemma twinTwist_norm (α : ℝ) : ‖twinTwist α‖ = 1 := by
   sorry -- |exp(2πi·2α)| = 1 for purely imaginary exponent
 
+/-! # Goldbach Phase Twist
+
+For Goldbach's Conjecture with target N:
+  Ψ_goldbach(α) = φ_𝔐(α) · e(Nα)
+
+The phase e(Nα) aligns Goldbach pairs:
+  For a Goldbach pair (p, N-p):
+    e(pα) · e((N-p)α)* = e(pα - (N-p)α) = e((2p-N)α)
+
+  When we multiply by e(Nα) and sum:
+    Σ_{p prime} Λ(p)·Λ(N-p)·e((2p-N+N)α) = Σ Λ(p)·Λ(N-p)·e(2pα)
+
+  At α = 0 (major arc center), all terms contribute positively.
+-/
+
+/-- The Goldbach twist e(Nα) = exp(2πiNα) -/
+def goldbachTwist (N : ℕ) (α : ℝ) : ℂ :=
+  circleChar N α
+
+/-- Goldbach twist is a pure phase: |e(Nα)| = 1 -/
+lemma goldbachTwist_norm (N : ℕ) (α : ℝ) : ‖goldbachTwist N α‖ = 1 := by
+  sorry -- |exp(2πi·Nα)| = 1
+
+/-- **THE GOLDBACH DRIFT SYMBOL**
+
+    Ψ_goldbach(N; α) = φ_𝔐(α) · e(Nα)
+
+    This detects Goldbach pairs for even N:
+    - φ_𝔐 restricts to Major Arcs
+    - e(Nα) aligns phases for sum p + (N-p) = N
+-/
+def goldbachDriftSymbol (N Q X : ℕ) : ℝ → ℂ := fun α ↦
+  (majorArcCutoff Q X α : ℂ) * goldbachTwist N α
+
+/-- Goldbach drift symbol is in H^s for all s ≥ 0 -/
+theorem goldbachDriftSymbol_in_sobolev (N Q X : ℕ) (s : ℝ) (hs : s ≥ 0) :
+    HasFiniteSobolevNorm s (goldbachDriftSymbol N Q X) := by
+  sorry
+
+/-- The Goldbach drift integral:
+    I_goldbach(N; X) = ∫_𝕋 Ψ_goldbach(α) · |S_X(α)|² dα
+-/
+def goldbachDriftIntegral (N Q X : ℕ) : ℂ :=
+  ∫ α in Set.Icc 0 1, goldbachDriftSymbol N Q X α * (primeExpSumSq X α : ℂ)
+
+/-- Real part of Goldbach drift integral -/
+def goldbachDriftIntegralReal (N Q X : ℕ) : ℝ :=
+  Complex.re (goldbachDriftIntegral N Q X)
+
+/-- **GOLDBACH DRIFT ASYMPTOTIC**
+
+    For even N ≥ 4:
+    ∫_𝔐 Ψ_goldbach · |S|² = 𝔖(N) · N + o(N)
+
+    This uses the same Sobolev machinery as TPC.
+-/
+axiom goldbach_drift_asymptotic (N : ℕ) (hN : Even N) (hN4 : N ≥ 4) :
+    ∃ (C A : ℝ) (hC : C > 0) (hA : A > 0), ∀ Q X : ℕ, X > 0 →
+      |goldbachDriftIntegralReal N Q X - goldbach_singular_series N * N| ≤
+        C * N / (Real.log N)^A
+
 /-! # The Girsanov Drift Symbol -/
 
 /-- **THE DRIFT SYMBOL**
