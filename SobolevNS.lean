@@ -16,3 +16,4 @@
 -/
 
 import SobolevNS.NSBasic
+import SobolevNS.NSEquation
