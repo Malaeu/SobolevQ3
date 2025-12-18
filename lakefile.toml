@@ -16,3 +16,7 @@ rev = "v4.26.0"
 
 [[lean_lib]]
 name = "SobolevQ3"
+
+[[lean_lib]]
+name = "SobolevNS"
+globs = ["SobolevNS"]
