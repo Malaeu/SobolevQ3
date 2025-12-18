@@ -17,3 +17,4 @@
 
 import SobolevNS.NSBasic
 import SobolevNS.NSEquation
+import SobolevNS.GlobalRegularity
